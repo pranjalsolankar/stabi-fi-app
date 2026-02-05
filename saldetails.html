@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Stabi-Fii | Financial Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            background: #f1f5f9; 
+            color: #0f172a; 
+            min-height: 100vh;
+        }
+        .report-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .report-header {
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 1rem;
+        }
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: 4px solid #10b981;
+            color: #10b981;
+            padding: 5px 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            transform: rotate(15deg);
+            opacity: 0.2;
+            font-size: 1.5rem;
+            border-radius: 4px;
+        }
+        @media print {
+            .no-print { display: none; }
+            body { background: white; }
+            .report-card { border: 1px solid #000; box-shadow: none; }
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+
+    <nav class="max-w-4xl mx-auto mb-10 flex justify-between items-center no-print">
+        <h1 class="text-2xl font-black tracking-tighter">STABI-FII <span class="font-light text-slate-400">REPORTS</span></h1>
+        <div class="flex gap-4">
+            <button onclick="window.print()" class="px-4 py-2 bg-slate-200 rounded-md font-bold text-xs uppercase">Print PDF</button>
+            <button onclick="window.location.href='stu.html'" class="px-4 py-2 bg-slate-900 text-white rounded-md font-bold text-xs uppercase">Back</button>
+        </div>
+    </nav>
+
+    <main id="reportsContainer" class="max-w-4xl mx-auto space-y-12">
+        <div id="loader" class="text-center py-20 text-slate-400 font-bold uppercase animate-pulse">Generating Report...</div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://hwaubxhcclgkcznlqqtk.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_i7iB2vtL50H6tsTDWO_kYA_Mx6ZPpMw";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        window.onload = async () => {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            const [prof, goals] = await Promise.all([
+                supabaseClient.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+                supabaseClient.from("goals").select("*").eq("user_id", user.id)
+            ]);
+
+            if (prof.data) {
+                renderReport(prof.data, goals.data || []);
+            }
+        };
+
+        function getMonthName(dateString) {
+            if (!dateString) return "Current";
+            const date = new Date(dateString);
+            return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+        }
+
+        function renderReport(profile, goals) {
+            const container = document.getElementById('reportsContainer');
+            if (document.getElementById('loader')) document.getElementById('loader').remove();
+
+            const monthTitle = getMonthName(profile.salary_date);
+
+            const reportHTML = `
+                <div class="report-card p-8 md:p-12">
+                    <div class="stamp">Official Record</div>
+                    
+                    <div class="report-header mb-8 flex justify-between items-end">
+                        <div>
+                            <h2 class="text-4xl font-black uppercase text-slate-900">${monthTitle}</h2>
+                            <p class="text-slate-500 font-medium italic">Financial Statement for ${profile.full_name || 'Student'}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs font-black text-slate-400 uppercase">Statement ID</p>
+                            <p class="font-mono text-sm">#${profile.id.substring(0, 8)}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-xs font-black text-emerald-600 uppercase tracking-widest mb-2">Income & Allocation</h4>
+                                <div class="flex justify-between border-b border-slate-100 py-2">
+                                    <span class="text-slate-600">Monthly Allowance:</span>
+                                    <b class="text-slate-900">₹${Number(profile.monthly_income).toLocaleString()}</b>
+                                </div>
+                                <div class="flex justify-between border-b border-slate-100 py-2">
+                                    <span class="text-slate-600">Allowance Date:</span>
+                                    <b class="text-slate-900">${profile.salary_date || 'Not Set'}</b>
+                                </div>
+                                <div class="flex justify-between border-b border-slate-100 py-2">
+                                    <span class="text-slate-600">Emergency Vault (Saved):</span>
+                                    <b class="text-blue-600">₹${Number(profile.emergency_budget).toLocaleString()}</b>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Summary</h4>
+                                <div class="bg-slate-50 p-4 rounded-lg">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-bold text-slate-500">Net Remaining:</span>
+                                        <span class="text-2xl font-black text-slate-900">₹${Number(profile.final_balance).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-xs font-black text-blue-600 uppercase tracking-widest mb-4">Active Savings Goals</h4>
+                            <div class="space-y-4">
+                                ${goals.length > 0 ? goals.map(g => {
+                                    const percent = Math.min((g.saved / g.target) * 100, 100).toFixed(0);
+                                    return `
+                                        <div>
+                                            <div class="flex justify-between text-xs mb-1">
+                                                <span class="font-bold uppercase">${g.name}</span>
+                                                <span class="font-mono">${percent}%</span>
+                                            </div>
+                                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                                <div class="bg-blue-500 h-full" style="width: ${percent}%"></div>
+                                            </div>
+                                            <p class="text-[10px] text-slate-400 mt-1">₹${g.saved.toLocaleString()} of ₹${g.target.toLocaleString()}</p>
+                                        </div>
+                                    `;
+                                }).join('') : '<p class="text-slate-400 italic text-sm">No active goals found for this period.</p>'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 pt-6 border-t border-slate-100 text-[10px] text-slate-400 flex justify-between">
+                        <p>© 2026 Stabi-Fii Financial Systems</p>
+                        <p>This report is generated automatically based on user-provided data.</p>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = reportHTML;
+        }
+    </script>
+</body>
+</html>

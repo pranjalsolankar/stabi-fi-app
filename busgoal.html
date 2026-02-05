@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Stabi-Fii | Manage Goals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: linear-gradient(180deg, #cbd5e1 0%, #ffffff 40%, #ffffff 100%); min-height: 100vh; color: #0f172a; background-attachment: fixed; }
+        .card-custom { border-radius: 20px; background-color: #0f172a; border: 1px solid rgba(16, 185, 129, 0.2); box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.4); }
+        .btn-3d { position: relative; transition: all 0.1s; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .btn-blue-3d { background-color: #3b82f6; box-shadow: 0 5px 0 #1e3a8a; }
+        .btn-blue-3d:active { box-shadow: 0 0px 0 #1e3a8a; transform: translateY(5px); }
+        .btn-emerald-3d { background-color: #10b981; box-shadow: 0 5px 0 #065f46; }
+        .btn-emerald-3d:active { box-shadow: 0 0px 0 #065f46; transform: translateY(5px); }
+        .btn-rose-3d { background-color: #f43f5e; box-shadow: 0 5px 0 #9f1239; }
+        .btn-rose-3d:active { box-shadow: 0 0px 0 #9f1239; transform: translateY(5px); }
+        
+        /* Details Button Slow Blink */
+        @keyframes slowBlink {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.02); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .btn-blink { animation: slowBlink 3s infinite ease-in-out; }
+
+        .money-num { font-weight: 300 !important; font-size: 1.75rem !important; }
+        .prog-bg { background: rgba(255,255,255,0.1); border-radius: 99px; height: 10px; width: 100%; overflow: hidden; }
+        .prog-fill { background: #10b981; height: 100%; border-radius: 99px; transition: width 0.8s ease; }
+    </style>
+</head>
+<body class="font-sans">
+    <nav class="w-full px-6 py-6 flex justify-between items-center max-w-[1400px] mx-auto">
+        <div class="flex items-center gap-3"><span class="text-4xl">⚡</span><b class="text-4xl tracking-tighter text-slate-800">Stabi-Fii</b></div>
+        <div class="flex gap-4">
+            <button onclick="window.location.href='studetails.html'" class="btn-blink px-6 py-2 rounded-xl bg-emerald-500 text-white font-black text-xs uppercase shadow-lg border-b-4 border-emerald-700">My Details</button>
+            <button onclick="window.location.href='stu.html'" class="px-6 py-2 rounded-xl bg-slate-900 text-white font-black text-xs uppercase shadow-lg">Dashboard</button>
+        </div>
+    </nav>
+
+    <main class="max-w-[1200px] mx-auto p-4 grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div class="card-custom p-10 text-white text-center">
+            <h3 class="text-xl font-black text-emerald-400 mb-4 uppercase tracking-widest">💰 Available Money</h3>
+            <div class="money-num text-white bg-white/5 py-6 rounded-2xl border border-white/10" id="availableDisplay" style="font-size: 3rem !important;">₹0</div>
+        </div>
+
+        <div class="card-custom p-10 text-white">
+            <h3 class="text-xl font-black text-blue-400 mb-6 uppercase tracking-widest">🎯 Start New Goal</h3>
+            <div class="space-y-4">
+                <input type="text" id="gName" placeholder="Goal Name" class="w-full bg-slate-800 border border-white/10 rounded-xl p-4 text-white outline-none font-bold uppercase">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="gTarget" placeholder="Target ₹" class="money-num w-full bg-slate-800 border border-white/10 rounded-xl p-4 text-white outline-none">
+                    <input type="number" id="gInitial" placeholder="Initial ₹" class="money-num w-full bg-slate-800 border border-white/10 rounded-xl p-4 text-white outline-none">
+                </div>
+                <button onclick="createGoal()" class="btn-3d btn-blue-3d w-full py-4 rounded-xl font-black uppercase text-sm">Create Goal</button>
+            </div>
+        </div>
+
+        <div id="goalsListContainer" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 pb-20"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://hwaubxhcclgkcznlqqtk.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_i7iB2vtL50H6tsTDWO_kYA_Mx6ZPpMw";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let balance = 0;
+
+        window.onload = () => refresh();
+
+        async function refresh() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if(!user) return window.location.href = 'login.html';
+
+            const [prof, goals] = await Promise.all([
+                supabaseClient.from("profiles").select("final_balance").eq("id", user.id).maybeSingle(),
+                supabaseClient.from("goals").select("*").eq("user_id", user.id).order('created_at', { ascending: false })
+            ]);
+
+            balance = Number(prof.data?.final_balance) || 0;
+            document.getElementById('availableDisplay').textContent = `₹${balance.toLocaleString()}`;
+            render(goals.data || []);
+        }
+
+        function render(goals) {
+            document.getElementById('goalsListContainer').innerHTML = goals.map(g => {
+                const p = Math.min((g.saved / g.target) * 100, 100).toFixed(0);
+                return `
+                <div class="card-custom p-8 text-white">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="text-xl font-black uppercase">${g.name}</h4>
+                            <p class="money-num text-white/60" style="font-size: 1rem !important;">₹${g.saved.toLocaleString()} / ₹${g.target.toLocaleString()}</p>
+                        </div>
+                        <button onclick="deleteGoal('${g.id}')" class="text-rose-400 font-black text-xl hover:scale-110 transition-transform">✕</button>
+                    </div>
+                    
+                    <div class="prog-bg mb-6"><div class="prog-fill" style="width:${p}%"></div></div>
+                    
+                    <div class="space-y-4">
+                        <input type="number" id="val-${g.id}" placeholder="Enter Amount ₹" class="money-num w-full bg-slate-800 border border-white/5 rounded-xl p-3 text-sm outline-none">
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="btn-3d btn-emerald-3d py-3 rounded-xl font-black uppercase text-xs" onclick="handleGoalMoney('${g.id}', ${g.saved}, 'save')">Save</button>
+                            <button class="btn-3d btn-rose-3d py-3 rounded-xl font-black uppercase text-xs" onclick="handleGoalMoney('${g.id}', ${g.saved}, 'withdraw')">Withdraw</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function createGoal() {
+            const name = document.getElementById('gName').value;
+            const target = Number(document.getElementById('gTarget').value);
+            const initial = Number(document.getElementById('gInitial').value) || 0;
+            
+            if (!name || target <= 0) { alert("Please enter valid goal details"); return; }
+            if (initial > balance) { alert("Not enough money in available balance!"); return; }
+            
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            
+            await supabaseClient.from("goals").insert([{ user_id: user.id, name, target, saved: initial }]);
+            await supabaseClient.from("profiles").update({ final_balance: balance - initial }).eq("id", user.id);
+            
+            // Reset inputs
+            document.getElementById('gName').value = '';
+            document.getElementById('gTarget').value = '';
+            document.getElementById('gInitial').value = '';
+            
+            refresh();
+        }
+
+        async function handleGoalMoney(id, currentSaved, action) {
+            const amt = Number(document.getElementById(`val-${id}`).value) || 0;
+            if (amt <= 0) return;
+
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            let newGoalTotal = 0;
+            let newAvailableBalance = 0;
+
+            if (action === 'save') {
+                if (amt > balance) { alert("Insufficient Available Money!"); return; }
+                newGoalTotal = currentSaved + amt;
+                newAvailableBalance = balance - amt;
+            } else {
+                if (amt > currentSaved) { alert("Cannot withdraw more than what is saved in this goal!"); return; }
+                newGoalTotal = currentSaved - amt;
+                newAvailableBalance = balance + amt;
+            }
+            
+            await Promise.all([
+                supabaseClient.from("goals").update({ saved: newGoalTotal }).eq("id", id),
+                supabaseClient.from("profiles").update({ final_balance: newAvailableBalance }).eq("id", user.id)
+            ]);
+            
+            refresh();
+        }
+
+        async function deleteGoal(id) {
+            if(!confirm("Are you sure you want to delete this goal? Saved money will not be automatically refunded.")) return;
+            await supabaseClient.from("goals").delete().eq("id", id);
+            refresh();
+        }
+    </script>
+</body>
+</html>
