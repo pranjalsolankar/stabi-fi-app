@@ -11,48 +11,31 @@
 /* This only affects mobile/small screens */
 /* This triggers for mobile devices (screens smaller than 768px) */
 @media screen and (max-width: 768px) {
-    
-    /* 1. Make the dark boxes fill the screen width and center content */
-    /* Target the background color you used in the screenshot */
-    div[class*="bg-[#0b1120]"], .card-container {
-        width: 94% !important;      /* Makes boxes big and nearly full-screen */
-        max-width: 94% !important;
-        margin: 15px auto !important; /* Centers the boxes on the screen */
-        padding: 25px 15px !important; /* Increases internal spacing */
+    /* 1. The container for the three items */
+    .recent-expenses-row, 
+    div[class*="flex"][class*="gap-"] { 
         display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important; /* Centers all content inside the box */
+        flex-direction: row !important; /* Keep them in one line */
+        justify-content: center !important;
+        width: 100% !important;
+        gap: 10px !important;
+    }
+
+    /* 2. Make BOTH inputs (Item and Rupee) identical in size */
+    input[placeholder="Item"], 
+    input[placeholder="₹"] {
+        flex: 1 !important;    /* This forces them to share space 50/50 */
+        width: 0 !important;   /* Allows flex to dictate the width */
+        min-width: 0 !important;
+        height: 50px !important;
         text-align: center !important;
     }
 
-    /* 2. Center and enlarge headings */
-    h2, .text-xl, .text-2xl {
-        width: 100% !important;
-        text-align: center !important;
-        margin-bottom: 20px !important;
-        font-size: 1.5rem !important; /* Makes headings bigger on mobile */
-    }
-
-    /* 3. Stack inputs and buttons vertically so they don't go off-screen */
-    /* This fixes the pink button and rupee box issue in your screenshot */
-    .flex.gap-2, .flex.gap-4 {
-        flex-direction: column !important; 
-        width: 100% !important;
-        gap: 15px !important;
-    }
-
-    /* 4. Make all buttons and inputs large and full-width */
-    input, button {
-        width: 100% !important;
-        height: 55px !important; /* Much larger for thumb-tapping */
-        font-size: 18px !important;
-        border-radius: 12px !important;
-    }
-
-    /* 5. Keep side-by-side buttons (like Deposit/Withdraw) if desired */
-    /* Only do this if you want two buttons per row; otherwise, keep above code */
-    .flex.w-full.gap-4 {
-        flex-direction: row !important;
+    /* 3. The Plus Button */
+    button.bg-pink-500 {
+        width: 60px !important; /* Keep the button a fixed square-ish size */
+        height: 50px !important;
+        flex-shrink: 0 !important; /* Prevents the button from squishing */
     }
 }
         body { 
