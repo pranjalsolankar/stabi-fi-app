@@ -9,46 +9,50 @@
 
       /* This code only runs on screens smaller than 600px */
 /* This only affects mobile/small screens */
+/* This triggers for mobile devices (screens smaller than 768px) */
 @media screen and (max-width: 768px) {
     
-    /* 1. Make the black boxes take up the full screen width */
-    /* Replace '.card-container' with whatever class your black boxes use */
-    .container, [class*="bg-[#0b1120]"] {
-        width: 95% !important;
-        max-width: 95% !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
+    /* 1. Make the dark boxes fill the screen width and center content */
+    /* Target the background color you used in the screenshot */
+    div[class*="bg-[#0b1120]"], .card-container {
+        width: 94% !important;      /* Makes boxes big and nearly full-screen */
+        max-width: 94% !important;
+        margin: 15px auto !important; /* Centers the boxes on the screen */
+        padding: 25px 15px !important; /* Increases internal spacing */
         display: flex !important;
         flex-direction: column !important;
-        align-items: center !important; /* Centers everything inside */
-        padding: 20px !important;
-    }
-
-    /* 2. Center all text and headings */
-    h2, p, .text-center {
+        align-items: center !important; /* Centers all content inside the box */
         text-align: center !important;
+    }
+
+    /* 2. Center and enlarge headings */
+    h2, .text-xl, .text-2xl {
         width: 100% !important;
+        text-align: center !important;
+        margin-bottom: 20px !important;
+        font-size: 1.5rem !important; /* Makes headings bigger on mobile */
     }
 
-    /* 3. Fix the 'Recent Expenses' row to prevent overflow */
-    /* This forces the row to wrap so the + button doesn't go off-screen */
-    .flex.gap-2, .recent-expenses-row {
-        flex-wrap: wrap !important;
-        justify-content: center !important;
+    /* 3. Stack inputs and buttons vertically so they don't go off-screen */
+    /* This fixes the pink button and rupee box issue in your screenshot */
+    .flex.gap-2, .flex.gap-4 {
+        flex-direction: column !important; 
+        width: 100% !important;
+        gap: 15px !important;
     }
 
-    /* 4. Increase size of inputs and buttons for 'zoomed' look */
+    /* 4. Make all buttons and inputs large and full-width */
     input, button {
-        width: 100% !important; /* Makes them fill the box width */
-        height: 55px !important; /* Larger touch area */
-        font-size: 18px !important; /* Larger readable text */
-        margin-bottom: 10px !important;
+        width: 100% !important;
+        height: 55px !important; /* Much larger for thumb-tapping */
+        font-size: 18px !important;
+        border-radius: 12px !important;
     }
 
-    /* Keep the small Rupee box and + button side-by-side if they fit */
-    input[placeholder="₹"], button.bg-pink-500 {
-        flex: 1 !important;
-        width: auto !important;
+    /* 5. Keep side-by-side buttons (like Deposit/Withdraw) if desired */
+    /* Only do this if you want two buttons per row; otherwise, keep above code */
+    .flex.w-full.gap-4 {
+        flex-direction: row !important;
     }
 }
         body { 
