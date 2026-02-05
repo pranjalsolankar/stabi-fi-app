@@ -2,34 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Stabi-Fii | Student Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
 
-      @media (max-width: 600px) {
-  /* This is the dark box container */
-  .container { 
-    display: flex;
-    flex-wrap: wrap;      /* Key: Allows buttons to move to a new line */
-    gap: 12px;            /* Adds space so they don't touch */
-    padding: 20px;        /* Gives breathing room inside the box */
-    width: 100%;          /* Ensures the box fills the screen width */
-    box-sizing: border-box; 
+      /* This code only runs on screens smaller than 600px */
+@media screen and (max-width: 600px) {
+  
+  /* 1. Force the container to wrap its children */
+  .expenses-container { 
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    width: 100% !important;
   }
 
-  /* Make the first input (Expense name) take the full top row */
-  .container input:first-child {
-    width: 100%;
-    font-size: 18px;      /* Makes it look 'normally zoomed' */
+  /* 2. Make the 'Item' input take the full top row */
+  .expenses-container input:first-child {
+    width: 100% !important;
+    flex: none !important;
   }
 
-  /* Make the Rupee input and Red button sit side-by-side on the 2nd row */
-  .container input:nth-child(2), 
-  .container .add-button {
-    flex: 1;              /* They share the bottom row 50/50 */
-    height: 50px;         /* Larger touch target for thumbs */
-    font-size: 18px;
+  /* 3. Make the Rupee input and Red button stay inside the box */
+  .expenses-container input:nth-child(2),
+  .expenses-container button {
+    flex: 1 !important; /* They share the remaining space */
+    min-width: 0 !important; /* Prevents them from pushing out of the box */
   }
 }
         body { 
