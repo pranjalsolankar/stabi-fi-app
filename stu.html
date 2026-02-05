@@ -6,6 +6,16 @@
     <title>Stabi-Fii | Student Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+
+        @media (max-width: 600px) {
+  .container {
+    flex-direction: column; /* Stacks the inputs and button vertically */
+  }
+  
+  .input-field, .add-button {
+    width: 100%; /* Makes them span the full width of the phone */
+  }
+}
         body { 
             background: radial-gradient(circle, #ffffff 0%, #f8fafc 100%); 
             min-height: 100vh; 
