@@ -6,6 +6,44 @@
     <title>Stabi-Fii | Student Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+
+        @media screen and (max-width: 768px) {
+    /* 1. Ensure the container holds everything in one centered row */
+    .recent-expenses-row, 
+    div[class*="bg-[#0b1120]"] > div.flex {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        gap: 10px !important;
+        padding: 0 5px !important;
+    }
+
+    /* 2. Fix the Green Circle Box (Item Input) */
+    /* We make both inputs share the space 50/50 */
+    input[type="text"], 
+    input[placeholder="₹"] {
+        flex: 1 !important;    /* This makes them equal width */
+        min-width: 0 !important;
+        height: 50px !important;
+        background-color: #1e293b !important; /* Slate-800 look */
+        border-radius: 8px !important;
+        color: white !important;
+        padding: 0 10px !important;
+        font-size: 16px !important;
+    }
+
+    /* 3. The Plus Button - Keep it square and centered */
+    button.bg-pink-500 {
+        width: 60px !important;
+        height: 50px !important;
+        flex-shrink: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+}
         body { 
             background: radial-gradient(circle, #ffffff 0%, #f8fafc 100%); 
             min-height: 100vh; 
