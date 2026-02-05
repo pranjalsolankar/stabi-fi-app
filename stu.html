@@ -8,28 +8,48 @@
     <style>
 
       /* This code only runs on screens smaller than 600px */
-@media screen and (max-width: 600px) {
-  
-  /* 1. Force the container to wrap its children */
-  .expenses-container { 
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 10px !important;
-    width: 100% !important;
-  }
+/* This only affects mobile/small screens */
+@media screen and (max-width: 768px) {
+    
+    /* 1. Make the black boxes take up the full screen width */
+    /* Replace '.card-container' with whatever class your black boxes use */
+    .container, [class*="bg-[#0b1120]"] {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important; /* Centers everything inside */
+        padding: 20px !important;
+    }
 
-  /* 2. Make the 'Item' input take the full top row */
-  .expenses-container input:first-child {
-    width: 100% !important;
-    flex: none !important;
-  }
+    /* 2. Center all text and headings */
+    h2, p, .text-center {
+        text-align: center !important;
+        width: 100% !important;
+    }
 
-  /* 3. Make the Rupee input and Red button stay inside the box */
-  .expenses-container input:nth-child(2),
-  .expenses-container button {
-    flex: 1 !important; /* They share the remaining space */
-    min-width: 0 !important; /* Prevents them from pushing out of the box */
-  }
+    /* 3. Fix the 'Recent Expenses' row to prevent overflow */
+    /* This forces the row to wrap so the + button doesn't go off-screen */
+    .flex.gap-2, .recent-expenses-row {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+
+    /* 4. Increase size of inputs and buttons for 'zoomed' look */
+    input, button {
+        width: 100% !important; /* Makes them fill the box width */
+        height: 55px !important; /* Larger touch area */
+        font-size: 18px !important; /* Larger readable text */
+        margin-bottom: 10px !important;
+    }
+
+    /* Keep the small Rupee box and + button side-by-side if they fit */
+    input[placeholder="₹"], button.bg-pink-500 {
+        flex: 1 !important;
+        width: auto !important;
+    }
 }
         body { 
             background: radial-gradient(circle, #ffffff 0%, #f8fafc 100%); 
