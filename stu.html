@@ -11,31 +11,40 @@
 /* This only affects mobile/small screens */
 /* This triggers for mobile devices (screens smaller than 768px) */
 @media screen and (max-width: 768px) {
-    /* 1. The container for the three items */
+    /* 1. Ensure the container holds everything in one centered row */
     .recent-expenses-row, 
-    div[class*="flex"][class*="gap-"] { 
+    div[class*="bg-[#0b1120]"] > div.flex {
         display: flex !important;
-        flex-direction: row !important; /* Keep them in one line */
+        flex-direction: row !important;
         justify-content: center !important;
+        align-items: center !important;
         width: 100% !important;
         gap: 10px !important;
+        padding: 0 5px !important;
     }
 
-    /* 2. Make BOTH inputs (Item and Rupee) identical in size */
-    input[placeholder="Item"], 
+    /* 2. Fix the Green Circle Box (Item Input) */
+    /* We make both inputs share the space 50/50 */
+    input[type="text"], 
     input[placeholder="₹"] {
-        flex: 1 !important;    /* This forces them to share space 50/50 */
-        width: 0 !important;   /* Allows flex to dictate the width */
+        flex: 1 !important;    /* This makes them equal width */
         min-width: 0 !important;
         height: 50px !important;
-        text-align: center !important;
+        background-color: #1e293b !important; /* Slate-800 look */
+        border-radius: 8px !important;
+        color: white !important;
+        padding: 0 10px !important;
+        font-size: 16px !important;
     }
 
-    /* 3. The Plus Button */
+    /* 3. The Plus Button - Keep it square and centered */
     button.bg-pink-500 {
-        width: 60px !important; /* Keep the button a fixed square-ish size */
+        width: 60px !important;
         height: 50px !important;
-        flex-shrink: 0 !important; /* Prevents the button from squishing */
+        flex-shrink: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
 }
         body { 
