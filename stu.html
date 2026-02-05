@@ -7,13 +7,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
 
-        @media (max-width: 600px) {
+       @media (max-width: 600px) {
+  /* This makes the whole container feel more 'filled' */
   .container {
-    flex-direction: column; /* Stacks the inputs and button vertically */
+    padding: 20px; 
+    gap: 20px;
   }
-  
+
+  /* Increase font size and padding so it looks zoomed in/readable */
   .input-field, .add-button {
-    width: 100%; /* Makes them span the full width of the phone */
+    font-size: 18px;    /* Larger text is easier to read */
+    padding: 12px;      /* Makes the boxes taller/thicker */
+    border-radius: 8px; /* Smooth corners look better on mobile */
+  }
+
+  /* If you have titles like "EXPENSES" */
+  h2, .title {
+    font-size: 1.5rem;
+    text-align: center;
   }
 }
         body { 
